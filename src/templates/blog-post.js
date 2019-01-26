@@ -1,5 +1,6 @@
 import React from 'react'
 import { Link, graphql } from 'gatsby'
+import { TwitterShareButton, TwitterIcon } from 'react-share';
 
 import Bio from '../components/Bio'
 import Layout from '../components/Layout'
@@ -10,22 +11,31 @@ class BlogPostTemplate extends React.Component {
   render() {
     const post = this.props.data.markdownRemark
     const siteTitle = this.props.data.site.siteMetadata.title
+    const pageUrl = this.props.data.site.siteMetadata.siteUrl + this.props.data.markdownRemark.fields.slug
     const { previous, next } = this.props.pageContext
 
     return (
       <Layout location={this.props.location} title={siteTitle}>
         <SEO title={post.frontmatter.title} description={post.excerpt} />
         <h1>{post.frontmatter.title}</h1>
-        <p
-          style={{
-            ...scale(-1 / 5),
-            display: `block`,
-            marginBottom: rhythm(1),
-            marginTop: rhythm(-1),
-          }}
-        >
-          {post.frontmatter.date}
-        </p>
+        <div style={{
+          display: `flex`,
+          justifyCntent: `center`,
+          alignItems: `center`,
+          marginBottom: `1em`
+        }}>
+          <p style={{
+            flexGrow: 1,
+            marginBottom: 0
+          }}>
+            {post.frontmatter.date}
+          </p>
+          <TwitterShareButton 
+            title={post.frontmatter.title  + " | " + siteTitle}
+            url={pageUrl}>
+            <TwitterIcon size={24} />
+          </TwitterShareButton>
+        </div>
         <div dangerouslySetInnerHTML={{ __html: post.html }} />
         <hr
           style={{
@@ -71,12 +81,16 @@ export const pageQuery = graphql`
       siteMetadata {
         title
         author
+        siteUrl
       }
     }
     markdownRemark(fields: { slug: { eq: $slug } }) {
       id
       excerpt(pruneLength: 160)
       html
+      fields {
+        slug
+      }
       frontmatter {
         title
         date(formatString: "MMMM DD, YYYY")

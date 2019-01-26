@@ -3,7 +3,7 @@ module.exports = {
     title: `雑記帖`,
     author: `Mutsuki Kimuraya`,
     description: `ただの覚え書き`,
-    siteUrl: `https://zaubermaerchen.info/`,
+    siteUrl: `https://blog.zaubermaerchen.info`,
     social: {
       twitter: `zaubermaerchen`,
     },
@@ -57,8 +57,8 @@ module.exports = {
     {
       resolve: `gatsby-plugin-manifest`,
       options: {
-        name: `Gatsby Starter Blog`,
-        short_name: `GatsbyJS`,
+        name: `雑記帖`,
+        short_name: `雑記帖`,
         start_url: `/`,
         background_color: `#ffffff`,
         theme_color: `#663399`,
