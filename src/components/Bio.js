@@ -1,54 +1,48 @@
-import React from 'react'
-import { StaticQuery, graphql } from 'gatsby'
-import Image from 'gatsby-image'
+/**
+ * Bio component that queries for data
+ * with Gatsby's useStaticQuery component
+ *
+ * See: https://www.gatsbyjs.com/docs/use-static-query/
+ */
 
-import { rhythm } from '../utils/typography'
+import * as React from "react"
+import { useStaticQuery, graphql } from "gatsby"
+import { StaticImage } from "gatsby-plugin-image"
 
-function Bio() {
+const Bio = () => {
+  const data = useStaticQuery(graphql`
+    query BioQuery {
+      site {
+        siteMetadata {
+          author {
+            name
+            summary
+          }
+          social {
+            twitter
+          }
+        }
+      }
+    }
+  `)
+
+  // Set these values by editing "siteMetadata" in gatsby-config.js
+  const author = data.site.siteMetadata?.author
+  const social = data.site.siteMetadata?.social
+
   return (
-    <StaticQuery
-      query={bioQuery}
-      render={data => {
-        const { author, social } = data.site.siteMetadata
-        return (
-          <div
-            style={{
-              display: `flex`,
-              marginBottom: rhythm(2.5),
-            }}
-          >
-            <p>
-              Written by <strong>
-              <a href={`https://twitter.com/${social.twitter}`}>
-                {author}
+    <div className="bio">
+      {author?.name && (
+        <p>
+          Written by <strong>
+              <a href={`https://twitter.com/${social?.twitter || ``}`}>
+                {author.name}
               </a>
               </strong>
-            </p>
-          </div>
-        )
-      }}
-    />
+        </p>
+      )}
+    </div>
   )
 }
-
-const bioQuery = graphql`
-  query BioQuery {
-    avatar: file(absolutePath: { regex: "/profile-pic.jpg/" }) {
-      childImageSharp {
-        fixed(width: 50, height: 50) {
-          ...GatsbyImageSharpFixed
-        }
-      }
-    }
-    site {
-      siteMetadata {
-        author
-        social {
-          twitter
-        }
-      }
-    }
-  }
-`
 
 export default Bio

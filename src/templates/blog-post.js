@@ -1,49 +1,59 @@
-import React from 'react'
-import { Link, graphql } from 'gatsby'
+import * as React from "react"
+import { Link, graphql } from "gatsby"
 import { TwitterShareButton, TwitterIcon } from 'react-share';
 
-import Bio from '../components/Bio'
-import Layout from '../components/Layout'
-import SEO from '../components/seo'
-import { rhythm, scale } from '../utils/typography'
+import Bio from "../components/bio"
+import Layout from "../components/layout"
+import Seo from "../components/seo"
 
-class BlogPostTemplate extends React.Component {
-  render() {
-    const post = this.props.data.markdownRemark
-    const siteTitle = this.props.data.site.siteMetadata.title
-    const pageUrl = this.props.data.site.siteMetadata.siteUrl + this.props.data.markdownRemark.fields.slug
-    const { previous, next } = this.props.pageContext
+const BlogPostTemplate = ({ data, location }) => {
+  const post = data.markdownRemark
+  const siteTitle = data.site.siteMetadata?.title || `Title`
+  const pageUrl = data.site.siteMetadata.siteUrl + data.markdownRemark.fields.slug
+  const { previous, next } = data
 
-    return (
-      <Layout location={this.props.location} title={siteTitle}>
-        <SEO title={post.frontmatter.title} description={post.excerpt} />
-        <h1>{post.frontmatter.title}</h1>
-        <div style={{
-          display: `flex`,
-          justifyCntent: `center`,
-          alignItems: `center`,
-          marginBottom: `1em`
-        }}>
-          <p style={{
-            flexGrow: 1,
-            marginBottom: 0
+  return (
+    <Layout location={location} title={siteTitle}>
+      <Seo
+        title={post.frontmatter.title}
+        description={post.frontmatter.description || post.excerpt}
+      />
+      <article
+        className="blog-post"
+        itemScope
+        itemType="http://schema.org/Article"
+      >
+        <header>
+          <h1 itemProp="headline">{post.frontmatter.title}</h1>
+          <div style={{
+            display: `flex`,
+            justifyCntent: `center`,
+            alignItems: `center`,
+            marginBottom: `1em`
           }}>
-            {post.frontmatter.date}
-          </p>
-          <TwitterShareButton 
-            title={post.frontmatter.title  + " | " + siteTitle}
-            url={pageUrl}>
-            <TwitterIcon size={24} />
-          </TwitterShareButton>
-        </div>
-        <div dangerouslySetInnerHTML={{ __html: post.html }} />
-        <hr
-          style={{
-            marginBottom: rhythm(1),
-          }}
+            <p style={{
+              flexGrow: 1,
+              marginBottom: 0
+            }}>
+              {post.frontmatter.date}
+            </p>
+            <TwitterShareButton 
+              title={post.frontmatter.title  + " | " + siteTitle}
+              url={pageUrl}>
+              <TwitterIcon size={24} />
+            </TwitterShareButton>
+          </div>
+        </header>
+        <section
+          dangerouslySetInnerHTML={{ __html: post.html }}
+          itemProp="articleBody"
         />
-        <Bio />
-
+        <hr />
+        <footer>
+          <Bio />
+        </footer>
+      </article>
+      <nav className="blog-post-nav">
         <ul
           style={{
             display: `flex`,
@@ -68,23 +78,26 @@ class BlogPostTemplate extends React.Component {
             )}
           </li>
         </ul>
-      </Layout>
-    )
-  }
+      </nav>
+    </Layout>
+  )
 }
 
 export default BlogPostTemplate
 
 export const pageQuery = graphql`
-  query BlogPostBySlug($slug: String!) {
+  query BlogPostBySlug(
+    $id: String!
+    $previousPostId: String
+    $nextPostId: String
+  ) {
     site {
       siteMetadata {
         title
-        author
         siteUrl
       }
     }
-    markdownRemark(fields: { slug: { eq: $slug } }) {
+    markdownRemark(id: { eq: $id }) {
       id
       excerpt(pruneLength: 160)
       html
@@ -94,6 +107,23 @@ export const pageQuery = graphql`
       frontmatter {
         title
         date(formatString: "MMMM DD, YYYY")
+        description
+      }
+    }
+    previous: markdownRemark(id: { eq: $previousPostId }) {
+      fields {
+        slug
+      }
+      frontmatter {
+        title
+      }
+    }
+    next: markdownRemark(id: { eq: $nextPostId }) {
+      fields {
+        slug
+      }
+      frontmatter {
+        title
       }
     }
   }
